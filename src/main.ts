@@ -5,6 +5,7 @@ import { convertXlsxPathToIcsString } from "./functions"
 // console.log(convertXlsxPathToIcsString(path, Timezone.EST))
 
 const upload = document.getElementById("upload") as HTMLInputElement
+const timezone = document.getElementById("timezone") as HTMLSelectElement
 const convert = document.getElementById("convert") as HTMLButtonElement
 const response = document.getElementById("response") as HTMLSpanElement
 
@@ -13,13 +14,16 @@ upload?.addEventListener("change", (event: Event) => {
     convert.disabled = false
 })
 
-if (convert) {
-    convert.onclick = (click) => {
-        if (upload.files && upload.files.length > 0) {
+Object.values(Timezone).forEach((tz) => {
+    timezone.innerHTML += "<option>" + tz + "</option>"
+})
+
+async function handleClick() {
+    if (upload.files && upload.files.length > 0) {
             const file = upload.files[0]
             console.log(file)
             try {
-                const result = convertXlsxPathToIcsString(file, Timezone.EST).then((ics) => {
+                await convertXlsxPathToIcsString(file, timezone.value as Timezone).then((ics) => {
                     const blob = new Blob([ics], { type: "text/plain"});
                     const link = document.createElement("a");
 
@@ -41,6 +45,11 @@ if (convert) {
             response.innerText = "Something went wrong uploading the .xlsx file"
         }
         response.classList.remove("hidden")
+}
+
+if (convert) {
+    convert.onclick = (click) => {
+        handleClick()
     }
 }
 

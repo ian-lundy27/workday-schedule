@@ -20,7 +20,7 @@
                 width: 720px;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: space-between;
                 
             }
 
@@ -62,6 +62,10 @@
             <div class="content-wrapper">
                 <span>Select exported Workday .xlsx file</span>
                 <input id="upload" type="file" accept=".xlsx">
+            </div>
+            <div class="content-wrapper">
+                <span>Select timezone</span>
+                <select id="timezone"></select>
             </div>
             <div class="content-wrapper">
                 <button id="convert" disabled>Convert to .ics file</button>
