@@ -1,9 +1,6 @@
 import { Timezone } from "./enums"
 import { convertXlsxPathToIcsString } from "./functions"
 
-// const path = "C:/Users/jlund/Downloads/View_My_Courses(2).xlsx"
-// console.log(convertXlsxPathToIcsString(path, Timezone.EST))
-
 const upload = document.getElementById("upload") as HTMLInputElement
 const timezone = document.getElementById("timezone") as HTMLSelectElement
 const convert = document.getElementById("convert") as HTMLButtonElement
