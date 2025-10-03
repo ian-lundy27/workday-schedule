@@ -35,6 +35,7 @@ function eventToString(event: ICSEvent): string {
 }
 
 function calendarToString(cal: Calendar): string {
+    if (cal.length === 0) throw new Error("Empty calendar object (no events read from file)")
     let retString = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:ian-lundy27.github.io/workday-ics\n"
     for (const event of cal) {
         retString += eventToString(event) + "\n"
@@ -259,6 +260,8 @@ export async function convertXlsxPathToIcsString(file: File, timezone: Timezone)
     await parseFile(file).then((reqInfos) => {
         reqInfos.forEach((reqInfo) => calendar = calendar.concat(reqInfoToEvent(reqInfo, timezone)))
         console.log(calendar)
+    }).catch(err => {
+        throw err
     })
     return calendarToString(calendar)
 }
