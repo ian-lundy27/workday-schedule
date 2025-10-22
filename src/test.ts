@@ -16,6 +16,9 @@ type SharedXml = {
 type XmlCell = {
     $: {[key: string]: string}
     v?: string
+    is?: {
+        t: string[]
+    }[]
 }
 
 type XmlRow = {
@@ -51,9 +54,9 @@ export type RequiredInfo = {
 }
 
 function toRequiredInfo(row: Row): RequiredInfo | null {
-    return row["Course Listing"] && row["Meeting Patterns"] && row["Instructor"] && 
+    return (row["Course Listing"] || row["Course"]) && row["Meeting Patterns"] && row["Instructor"] && 
         row["Start Date"] && row["End Date"] ? {
-            course: row["Course Listing"],
+            course: row["Course Listing"] || row["Course"],
             patterns: row["Meeting Patterns"],
             instructor: row["Instructor"],
             start: row["Start Date"],
@@ -62,6 +65,10 @@ function toRequiredInfo(row: Row): RequiredInfo | null {
 }
 
 function getString(arr: string[], cell: XmlCell): string | null {
+    if (arr.length == 0 && cell.is) {
+        console.log(cell.is[0].t[0])
+        return cell.is[0] ? cell.is[0].t[0] : null
+    }
     if (cell.v) {
         try {
             let num = Number.parseInt(cell.v)
@@ -88,9 +95,6 @@ export async function parseFile(file: File): Promise<RequiredInfo[]> {
         await JSZip.loadAsync(file)
             .then(async (zip) => {
 
-                console.log(zip)
-                console.log(zip.files)
-
                 let sharedXmlString: string | null = null
                 let dataXmlString: string | null = null
 
@@ -110,7 +114,7 @@ export async function parseFile(file: File): Promise<RequiredInfo[]> {
                     if (err) {
                         console.log(err)
                     }
-                    result.sst.si.forEach((si) => sharedArr.push(si.t[0]))
+                    result.sst.si?.forEach((si) => sharedArr.push(si.t[0]))
                 })
 
                 parseString(dataXmlString, (err, result: DataXml) => {
@@ -125,7 +129,7 @@ export async function parseFile(file: File): Promise<RequiredInfo[]> {
                         if (!isClassRow) {
                             row.c.forEach((c) => {
                                 let text = getString(sharedArr, c)
-                                if (text == "Course Listing") {
+                                if (text == "Course Listing" || text == "Course") {
                                     isHeadersRow = true
                                 }
                                 if (isHeadersRow) {
@@ -148,6 +152,8 @@ export async function parseFile(file: File): Promise<RequiredInfo[]> {
                             break
                         }
                     }
+
+                    console.log(classRows)
 
                     classRows.forEach((row) => {
                         let converted = toRequiredInfo(row)
